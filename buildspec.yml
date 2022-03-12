@@ -1,0 +1,33 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9
+  pre_build:
+    commands:
+      - echo check AWS CLI installed...
+      - aws --version
+      - echo check if python is installed
+      - python3 --version
+      - echo check if pip is installed
+      - pip3 --version
+      - echo installing cfn-lint
+      - pip3 install cfn-lint
+      - echo check cfn-lint installed
+      - cfn-lint --version
+  build:
+    commands:
+      - echo validating the cfn template
+      - cfn-lint template1.yml
+      - echo cfn template build started on `date`
+      - aws cloudformation package --template-file template1.yml --s3-bucket bucket-test-outputpackage --output-template-file OutputTemplate.yml
+  post_build:
+    commands:
+      - echo Entered the post_build phase...
+      - echo Build completed on `date`
+artifacts:
+  files:
+    - OutputTemplate.yml
+    - template1.yml
+    #- '**/*'
